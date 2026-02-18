@@ -1,0 +1,191 @@
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Send, CheckCircle, AlertCircle } from 'lucide-react'
+import { AnimatedBackground } from '@/components/AnimatedBackground'
+import { GlowButton } from '@/components/GlowButton'
+
+export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    team: '',
+    message: ''
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError('')
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setIsSuccess(true)
+    } catch {
+      setError('Failed to send message. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }))
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0F1923] relative flex items-center justify-center p-4">
+      <AnimatedBackground />
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-2xl"
+      >
+        {/* Header */}
+        <div className="text-center mb-10">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-bold text-white mb-4"
+          >
+            Get in <span className="text-[#FF4655]">Touch</span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-[#A8B2C1] text-lg"
+          >
+            Have questions? We'd love to hear from you.
+          </motion.p>
+        </div>
+
+        {/* Form Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-[#1C2B3A]/80 backdrop-blur-md border border-[#2B3E50] rounded-xl p-8"
+        >
+          {isSuccess ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-12"
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
+                className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center"
+              >
+                <CheckCircle className="w-10 h-10 text-green-400" />
+              </motion.div>
+              <h2 className="text-2xl font-bold text-white mb-2">Message Sent!</h2>
+              <p className="text-[#A8B2C1] mb-6">
+                We'll get back to you as soon as possible.
+              </p>
+              <button
+                onClick={() => setIsSuccess(false)}
+                className="text-[#FF4655] hover:text-[#ff5a68] font-medium"
+              >
+                Send another message
+              </button>
+            </motion.div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-3"
+                >
+                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                  <p className="text-red-400 text-sm">{error}</p>
+                </motion.div>
+              )}
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Name */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#A8B2C1]">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    placeholder="Your name"
+                    className="w-full px-4 py-3 bg-[#0F1923] border border-[#2B3E50] rounded-lg text-white placeholder-[#A8B2C1]/50 focus:outline-none focus:border-[#FF4655] transition-colors"
+                  />
+                </div>
+
+                {/* Email */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#A8B2C1]">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="coach@team.com"
+                    className="w-full px-4 py-3 bg-[#0F1923] border border-[#2B3E50] rounded-lg text-white placeholder-[#A8B2C1]/50 focus:outline-none focus:border-[#FF4655] transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Team/Org */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#A8B2C1]">Team / Organization (Optional)</label>
+                <input
+                  type="text"
+                  name="team"
+                  value={formData.team}
+                  onChange={handleChange}
+                  placeholder="Your team name or organization"
+                  className="w-full px-4 py-3 bg-[#0F1923] border border-[#2B3E50] rounded-lg text-white placeholder-[#A8B2C1]/50 focus:outline-none focus:border-[#FF4655] transition-colors"
+                />
+              </div>
+
+              {/* Message */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#A8B2C1]">Message</label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  rows={5}
+                  placeholder="How can we help you?"
+                  className="w-full px-4 py-3 bg-[#0F1923] border border-[#2B3E50] rounded-lg text-white placeholder-[#A8B2C1]/50 focus:outline-none focus:border-[#FF4655] transition-colors resize-none"
+                />
+              </div>
+
+              {/* Submit */}
+              <GlowButton
+                type="submit"
+                className="w-full"
+                isLoading={isSubmitting}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <Send className="w-4 h-4" />
+                  Send Message
+                </span>
+              </GlowButton>
+            </form>
+          )}
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}
+

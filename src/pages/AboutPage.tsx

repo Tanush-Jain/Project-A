@@ -1,0 +1,208 @@
+import { motion } from 'framer-motion'
+import { Target, Brain, Zap, Shield, Users, Code, Database, Cpu } from 'lucide-react'
+import { AnimatedBackground } from '@/components/AnimatedBackground'
+import { GlowButton } from '@/components/GlowButton'
+import { Link } from 'react-router-dom'
+
+const timeline = [
+  {
+    year: '2024 Q1',
+    title: 'Launch',
+    description: 'Initial release with basic strategy generation',
+    icon: Brain
+  },
+  {
+    year: '2024 Q2',
+    title: 'Agent AI',
+    description: 'Advanced agent composition recommendations',
+    icon: Target
+  },
+  {
+    year: '2024 Q3',
+    title: 'Real-time Analysis',
+    description: 'Live match analysis and adaptations',
+    icon: Zap
+  },
+  {
+    year: '2024 Q4',
+    title: 'Pro Integration',
+    description: 'Partnership with professional esports teams',
+    icon: Users
+  }
+]
+
+const techStack = [
+  { icon: Code, name: 'React 18', desc: 'Frontend Framework' },
+  { icon: Database, name: 'Vector DB', desc: 'Strategy Storage' },
+  { icon: Cpu, name: 'Neural Networks', desc: 'AI Engine' },
+  { icon: Shield, name: 'Security', desc: 'Enterprise Grade' }
+]
+
+const steps = [
+  {
+    number: '01',
+    title: 'Select Your Setup',
+    description: 'Choose your map, team, and opponent to configure the strategy parameters.'
+  },
+  {
+    number: '02',
+    title: 'AI Analysis',
+    description: 'Our neural networks analyze thousands of professional matches and generate optimal tactics.'
+  },
+  {
+    number: '03',
+    title: 'Execute & Adapt',
+    description: 'Apply the strategy in-game and let AI adjust in real-time based on opponent behavior.'
+  }
+]
+
+export default function AboutPage() {
+  return (
+    <div className="min-h-screen bg-[#0F1923] relative">
+      <AnimatedBackground />
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+        {/* Hero */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-20"
+        >
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            About <span className="text-[#FF4655]">VALORANT.ai</span>
+          </h1>
+          <p className="text-xl text-[#A8B2C1] max-w-2xl mx-auto">
+            The most advanced AI-powered tactical coaching platform for competitive VALORANT.
+          </p>
+        </motion.div>
+
+        {/* Timeline */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-20"
+        >
+          <h2 className="text-3xl font-bold text-white text-center mb-12">
+            Our <span className="text-[#FF4655]">Journey</span>
+          </h2>
+          
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#2B3E50] hidden md:block" />
+            
+            <div className="space-y-12 md:space-y-0">
+              {timeline.map((item, index) => (
+                <motion.div
+                  key={item.year}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className={`relative flex items-center ${
+                    index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                  }`}
+                >
+                  <div className={`flex-1 ${index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12'}`}>
+                    <div className="bg-[#1C2B3A]/50 p-6 rounded-xl border border-[#2B3E50] inline-block">
+                      <span className="text-[#FF4655] font-mono text-sm">{item.year}</span>
+                      <h3 className="text-xl font-bold text-white mt-2">{item.title}</h3>
+                      <p className="text-[#A8B2C1] mt-1">{item.description}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Timeline dot */}
+                  <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#0F1923] border-2 border-[#FF4655] items-center justify-center z-10">
+                    <item.icon className="w-5 h-5 text-[#FF4655]" />
+                  </div>
+                  
+                  <div className="flex-1" />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Tech Stack */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-20"
+        >
+          <h2 className="text-3xl font-bold text-white text-center mb-4">
+            Built with <span className="text-[#FF4655]">Cutting-Edge</span> Tech
+          </h2>
+          <p className="text-[#A8B2C1] text-center mb-12">
+            Enterprise-grade infrastructure powering your competitive advantage
+          </p>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {techStack.map((tech, index) => (
+              <motion.div
+                key={tech.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="text-center p-6 bg-[#1C2B3A]/30 rounded-xl border border-[#2B3E50] hover:border-[#FF4655]/50 transition-colors"
+              >
+                <div className="w-14 h-14 mx-auto mb-4 rounded-lg bg-[#0F1923] border border-[#2B3E50] flex items-center justify-center">
+                  <tech.icon className="w-7 h-7 text-[#FF4655]" />
+                </div>
+                <h3 className="text-lg font-bold text-white">{tech.name}</h3>
+                <p className="text-sm text-[#A8B2C1]">{tech.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* How It Works */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl font-bold text-white text-center mb-4">
+            How It <span className="text-[#FF4655]">Works</span>
+          </h2>
+          <p className="text-[#A8B2C1] text-center mb-12">
+            Three simple steps to elevate your game
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {steps.map((step, index) => (
+              <motion.div
+                key={step.number}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="relative"
+              >
+                <div className="text-6xl font-bold text-[#FF4655]/20 absolute -top-2 left-0">
+                  {step.number}
+                </div>
+                <div className="pt-16 pl-4">
+                  <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
+                  <p className="text-[#A8B2C1]">{step.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <Link to="/signup">
+              <GlowButton>Get Started</GlowButton>
+            </Link>
+          </div>
+        </motion.section>
+      </div>
+    </div>
+  )
+}
+

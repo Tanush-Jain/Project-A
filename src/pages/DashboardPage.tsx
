@@ -1,0 +1,166 @@
+import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { Plus, Target, TrendingUp, Users, Zap, ArrowRight } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext'
+import { useStrategy } from '@/context/StrategyContext'
+import { AnimatedBackground } from '@/components/AnimatedBackground'
+import { StatCard } from '@/components/StatCard'
+import { StrategyCard, type StrategyData } from '@/components/StrategyCard'
+import { GlowButton } from '@/components/GlowButton'
+
+// Mock recent strategies
+const mockStrategies: StrategyData[] = [
+  {
+    id: '1',
+    map: 'Ascent',
+    yourTeam: 'Sentinels',
+    opponentTeam: 'LOUD',
+    timestamp: new Date(Date.now() - 1000 * 60 * 30),
+    winProbability: 68
+  },
+  {
+    id: '2',
+    map: 'Haven',
+    yourTeam: 'Paper Rex',
+    opponentTeam: 'Fnatic',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+    winProbability: 72
+  },
+  {
+    id: '3',
+    map: 'Bind',
+    yourTeam: 'Global Esports',
+    opponentTeam: 'Sentinels',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
+    winProbability: 54
+  }
+]
+
+export default function DashboardPage() {
+  const { user } = useAuth()
+  const { strategyHistory } = useStrategy()
+
+  const recentStrategies = strategyHistory.length > 0 ? strategyHistory : mockStrategies
+
+  return (
+    <div className="min-h-screen bg-[#0F1923] relative">
+      <AnimatedBackground />
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+        {/* Welcome Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-12"
+        >
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Welcome back, <span className="text-[#FF4655]">{user?.email?.split('@')[0] || 'Coach'}</span>
+          </h1>
+          <p className="text-[#A8B2C1] text-lg">
+            Ready to generate some strategies?
+          </p>
+        </motion.div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <StatCard
+            title="Strategies Created"
+            value={strategyHistory.length + 127}
+            icon={Target}
+            trend={{ value: 12, isPositive: true }}
+            delay={0.1}
+          />
+          <StatCard
+            title="Win Rate"
+            value="67.3%"
+            icon={TrendingUp}
+            trend={{ value: 5.2, isPositive: true }}
+            delay={0.2}
+          />
+          <StatCard
+            title="Teams Analyzed"
+            value={42}
+            icon={Users}
+            trend={{ value: 8, isPositive: true }}
+            delay={0.3}
+          />
+        </div>
+
+        {/* Main CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mb-12"
+        >
+          <div className="relative overflow-hidden rounded-2xl border border-[#2B3E50] bg-gradient-to-br from-[#1C2B3A] to-[#0F1923] p-8 md:p-12">
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0" style={{
+                backgroundImage: 'radial-gradient(circle at 2px 2px, #FF4655 1px, transparent 0)',
+                backgroundSize: '32px 32px'
+              }} />
+            </div>
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="text-center md:text-left">
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                  Generate New Strategy
+                </h2>
+                <p className="text-[#A8B2C1] max-w-md">
+                  Create AI-powered tactical strategies tailored to your team and opponents.
+                </p>
+              </div>
+              <Link to="/strategy">
+                <GlowButton size="lg" className="group">
+                  <Zap className="inline-block mr-2 w-5 h-5" />
+                  Start Generating
+                  <ArrowRight className="inline-block ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </GlowButton>
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Recent Strategies */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-white">Recent Strategies</h3>
+            <Link to="/strategy" className="text-[#FF4655] hover:text-[#ff5a68] text-sm font-medium flex items-center gap-1">
+              View All <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="space-y-4">
+            {recentStrategies.slice(0, 3).map((strategy, index) => (
+              <StrategyCard
+                key={strategy.id}
+                strategy={strategy}
+                delay={0.6 + index * 0.1}
+              />
+            ))}
+          </div>
+
+          {recentStrategies.length === 0 && (
+            <div className="text-center py-12 border border-[#2B3E50] rounded-xl bg-[#1C2B3A]/30">
+              <Target className="w-12 h-12 text-[#A8B2C1] mx-auto mb-4" />
+              <p className="text-[#A8B2C1] mb-4">No strategies yet. Create your first one!</p>
+              <Link to="/strategy">
+                <GlowButton>
+                  <Plus className="inline-block mr-2 w-4 h-4" />
+                  Generate Strategy
+                </GlowButton>
+              </Link>
+            </div>
+          )}
+        </motion.div>
+      </div>
+    </div>
+  )
+}
+
