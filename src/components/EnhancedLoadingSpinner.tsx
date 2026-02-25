@@ -21,8 +21,6 @@ export function EnhancedLoadingSpinner({
   const [elapsedTime, setElapsedTime] = useState(0)
   const [currentStage, setCurrentStage] = useState(Math.min(stage, LOADING_STAGES.length - 1))
 
-  const stagePercentage = 100 / LOADING_STAGES.length
-
   // Update elapsed time for progress bar
   useEffect(() => {
     const startTime = Date.now()

@@ -1,0 +1,210 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== ENUMS =====
+
+enum Plan {
+  FREE
+  PRO
+  TEAM
+}
+
+enum Game {
+  VALORANT
+  LOL
+  CS2
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+}
+
+// ===== USER =====
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  avatar          String?
+  createdAt       DateTime  @default(now())
+  
+  // Plan and gaming
+  plan            Plan      @default(FREE)
+  rank            String?   // e.g., "Diamond 2"
+  game            Game?     // VALORANT, LOL, CS2
+  
+  // Stripe
+  stripeCustomerId String?  @unique
+  
+  // Relations
+  teams           TeamMember[]
+  ownedTeams      Team[]     @relation("TeamOwner")
+  analyses        Analysis[]
+  strategies      Strategy[]
+  subscriptions   Subscription[]
+  playerStats     PlayerStats[]
+  
+  @@index([email])
+  @@map("users")
+}
+
+// ===== TEAM =====
+model Team {
+  id              String    @id @default(cuid())
+  name            String
+  logo            String?
+  region          String
+  game            Game
+  
+  // Owner
+  ownerId         String
+  owner           User      @relation("TeamOwner", fields: [ownerId], references: [id])
+  
+  // Relations
+  members         TeamMember[]
+  subscriptions   Subscription[]
+  analyses        Analysis[]
+  
+  @@index([ownerId])
+  @@index([region, game])
+  @@map("teams")
+}
+
+// ===== TEAM MEMBER (Many-to-Many for User <-> Team) =====
+model TeamMember {
+  id              String    @id @default(cuid())
+  userId          String
+  teamId          String
+  role            String    @default("member") // owner, captain, member
+  
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team            Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, teamId])
+  @@map("team_members")
+}
+
+// ===== ANALYSIS =====
+model Analysis {
+  id              String    @id @default(cuid())
+  
+  // User and Team
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId          String?
+  team            Team?     @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  
+  // Game info
+  game            Game      // VALORANT | LOL
+  youtubeUrl      String?
+  videoId         String?
+  yourTeam        String
+  opponentTeam    String
+  
+  // Full strategy JSON
+  analysisData    Json
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([teamId])
+  @@index([game, createdAt])
+  @@map("analyses")
+}
+
+// ===== STRATEGY =====
+model Strategy {
+  id              String    @id @default(cuid())
+  
+  // User
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Strategy details
+  mapName         String?
+  yourTeam        String
+  opponentTeam    String
+  game            Game      // VALORANT | LOL
+  
+  // Data
+  strategyData    Json
+  
+  // Flags
+  isSaved         Boolean   @default(false)
+  isPublic        Boolean   @default(false)
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([game, isPublic])
+  @@index([createdAt])
+  @@map("strategies")
+}
+
+// ===== SUBSCRIPTION =====
+model Subscription {
+  id                    String    @id @default(cuid())
+  
+  // User and Team
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId                String?
+  team                  Team?     @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  
+  // Plan
+  plan                  Plan      @default(FREE)
+  
+  // Stripe
+  stripeSubscriptionId  String?   @unique
+  
+  // Period
+  currentPeriodEnd      DateTime?
+  
+  // Status
+  status                SubscriptionStatus @default(ACTIVE)
+  
+  createdAt             DateTime  @default(now())
+  
+  @@unique([userId])
+  @@index([teamId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+// ===== PLAYER STATS =====
+model PlayerStats {
+  id              String    @id @default(cuid())
+  
+  // User
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Game data
+  game            Game
+  agentName       String?   // e.g., "Jett", "Omen" for Valorant
+  mapName         String?
+  
+  // Stats
+  winRate         Float     @default(0)
+  kda             Float     @default(0)
+  avgScore        Float     @default(0)
+  
+  // Riot API
+  riotPuuid       String?   @unique
+  
+  lastUpdated     DateTime  @default(now())
+  
+  @@unique([userId, game, agentName, mapName])
+  @@index([userId])
+  @@index([game])
+  @@map("player_stats")
+}
+

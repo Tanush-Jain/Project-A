@@ -17,6 +17,7 @@
 **Emergent** is a revolutionary platform that harnesses artificial intelligence to generate professional-grade VALORANT strategies. Whether you're a casual player looking to improve or a competitive team preparing for tournaments, Emergent delivers personalized, data-driven tactical insights that rival professional coaching analysis.
 
 ### The Problem We Solve
+
 - 🎯 Inconsistent team execution across different maps and matchups
 - 💭 Lack of systematic approach to opponent adaptation  
 - ⏱️ Time-consuming manual strategy creation and analysis
@@ -24,7 +25,9 @@
 - 🤝 Limited access to professional coaching insights
 
 ### The Solution
+
 Emergent combines **AI-powered analysis** with **professional esports coaching frameworks** to generate:
+
 - ✅ Map-specific tactical executions
 - ✅ Agent composition optimization
 - ✅ Second-by-second round timings
@@ -37,6 +40,7 @@ Emergent combines **AI-powered analysis** with **professional esports coaching f
 ## 🚀 Key Features
 
 ### 🎯 **Intelligent Strategy Generation**
+
 - **AI-Powered Analysis**: Advanced algorithms analyze team styles, map dynamics, and opponent patterns
 - **Coach-Level Insights**: Strategies rival professional VALORANT coaching ($10K+/hour value)
 - **Real-Time Customization**: Generate tailored strategies for any map, team, and opponent matchup
@@ -45,9 +49,11 @@ Emergent combines **AI-powered analysis** with **professional esports coaching f
 ### 📋 **Comprehensive Strategy Breakdown**
 
 #### Overview Panel
+
 Matchup analysis with key advantages, threats, and recommended approaches
 
-#### Agent Composition  
+#### Agent Composition
+
 Optimized team compositions with role assignments, player responsibilities, and alternative lineups
 
 #### Pistol Round Strategies
