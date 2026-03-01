@@ -1,40 +1,55 @@
 version: '3.8'
 
 services:
+  # Railway PostgreSQL Database
   db:
     image: postgres:15-alpine
     container_name: wopseeion-db
     environment:
-      POSTGRES_USER: wopseeion
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
-      POSTGRES_DB: wopseeion
+      POSTGRES_USER: ${POSTGRES_USER:-wopseeion}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-wopseeion}
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U wopseeion']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-wopseeion}']
       interval: 10s
       timeout: 5s
       retries: 5
+    # Railway compatible
+    networks:
+      - wopseeion-network
 
+  # Next.js Application
   app:
     build: .
     container_name: wopseeion-app
     environment:
-      DATABASE_URL: postgresql://wopseeion:${DB_PASSWORD:-changeme}@db:5432/wopseeion
+      DATABASE_URL: ${DATABASE_URL:-postgresql://wopseeion:changeme@db:5432/wopseeion}
       NEXT_PUBLIC_GEMINI_API_KEY: ${NEXT_PUBLIC_GEMINI_API_KEY}
       RIOT_API_KEY: ${RIOT_API_KEY}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
-      JWT_SECRET: ${JWT_SECRET}
+      STRIPE_PRO_MONTHLY_PRICE_ID: ${STRIPE_PRO_MONTHLY_PRICE_ID}
+      STRIPE_PRO_YEARLY_PRICE_ID: ${STRIPE_PRO_YEARLY_PRICE_ID}
+      STRIPE_TEAM_MONTHLY_PRICE_ID: ${STRIPE_TEAM_MONTHLY_PRICE_ID}
+      STRIPE_TEAM_YEARLY_PRICE_ID: ${STRIPE_TEAM_YEARLY_PRICE_ID}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
     ports:
       - '3000:3000'
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - wopseeion-network
 
+  # Redis for caching (optional)
   redis:
     image: redis:7-alpine
     container_name: wopseeion-redis
@@ -43,6 +58,12 @@ services:
     volumes:
       - redis_data:/data
     restart: unless-stopped
+    networks:
+      - wopseeion-network
+
+networks:
+  wopseeion-network:
+    driver: bridge
 
 volumes:
   postgres_data:

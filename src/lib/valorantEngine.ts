@@ -1,5 +1,5 @@
 import { getTeamByExactName } from '../data/teams'
-import type { Team, Player, MapStats } from '../data/types'
+import type { Team } from '../data/types'
 
 // ===== TYPE DEFINITIONS FOR STRATEGY OUTPUT =====
 
@@ -199,7 +199,7 @@ function generateFallbackStrategy(
   map: string
 ): StrategyOutput {
   const mapData = yourTeam.mapStats[map]
-  const opponentMapData = opponent.mapStats[map]
+// const opponentMapData = opponent.mapStats[map]
   
   const starPlayer = yourTeam.players.find(p => p.role === 'Duelist') || yourTeam.players[0]
   const opponentWeakness = opponent.players.find(p => p.role === 'Sentinel')?.weaknesses[0] || 'vulnerable to aggression'

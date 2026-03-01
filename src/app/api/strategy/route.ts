@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateValorantStrategy } from '@/lib/gemini'
+import { generateValorantStrategy as generateValorantAI } from '@/lib/valorant-strategy'
+// prisma is imported when saving strategies (optional)
 import { prisma as _prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
@@ -15,13 +17,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Call Gemini API
-    const strategy = await generateValorantStrategy({
-      map,
-      yourTeam,
-      opponentTeam,
-      gameMode: game,
-    })
+    // Decide which generator to use
+    let strategy
+    if (game === 'valorant') {
+      // use the new full Gemini-backed Valorant strategy module
+      strategy = await generateValorantAI(map, yourTeam, opponentTeam)
+    } else {
+      // fallback to simpler Gemini call for other games (e.g. lol)
+      strategy = await generateValorantStrategy({
+        map,
+        yourTeam,
+        opponentTeam,
+        gameMode: game,
+      })
+    }
 
     // Save to database (optional)
     // const savedStrategy = await prisma.strategy.create({
@@ -49,18 +58,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const _game = request.nextUrl.searchParams.get('game') || 'valorant'
-    // const userId = session.user.id
-
-    // Fetch recent strategies
-    // const strategies = await prisma.strategy.findMany({
-    //   where: { userId, game },
-    //   orderBy: { createdAt: 'desc' },
-    //   take: 20,
-    // })
-
-    return NextResponse.json([
-      { status: 200 }
-    ])
+    // in a real implementation you would look up recent strategies by user & game
+    return NextResponse.json([{ status: 200, game: _game }])
   } catch (error) {
     console.error('Strategy GET Error:', error)
     return NextResponse.json(

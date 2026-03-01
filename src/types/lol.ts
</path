@@ -1,0 +1,96 @@
+// League of Legends Type Definitions
+
+export type LoLRegion = 'LCK' | 'LPL' | 'LEC' | 'LCS'
+
+export interface LoLTeam {
+  id: string
+  name: string
+  region: LoLRegion
+  logo: string
+  emoji: string
+  playstyle: string
+  strengths: string[]
+  weaknesses: string[]
+}
+
+export interface ChampionPick {
+  name: string
+  role: 'Top' | 'Jungle' | 'Mid' | 'ADC' | 'Support'
+  player?: string
+}
+
+export interface VideoMetadata {
+  videoId: string
+  title: string
+  description: string
+  duration: number
+  thumbnail: string
+}
+
+export interface GameTimelineEvent {
+  time: string
+  phase: string
+  actions: string[]
+  keyDecision: string
+  goldAdvantage: number
+  objectives: {
+    dragons: number
+    towers: number
+    baron: boolean
+  }
+}
+
+export interface CoachingPoint {
+  title: string
+  description: string
+  priority: 'high' | 'medium' | 'low'
+}
+
+export interface MatchOverview {
+  yourTeam: string
+  yourSide: 'Blue' | 'Red'
+  opponentTeam: string
+  opponentSide: 'Blue' | 'Red'
+  result: 'win' | 'loss'
+  duration: string
+  tournament: string
+  yourChampions: ChampionPick[]
+  opponentChampions: ChampionPick[]
+  summary: string
+}
+
+export interface OpponentAnalysis {
+  playstyle: string
+  strengths: string[]
+  weaknesses: string[]
+  dangerousPlayers: DangerousPlayer[]
+}
+
+export interface DangerousPlayer {
+  name: string
+  role: string
+  champion: string
+  threat: string
+}
+
+export interface WinningStrategy {
+  keyPoints: string[]
+  championsToTarget: string[]
+  objectives: string[]
+}
+
+export interface LoLAnalysis {
+  matchOverview: MatchOverview
+  opponentAnalysis: OpponentAnalysis
+  winningStrategy: WinningStrategy
+  timeline: GameTimelineEvent[]
+  coachingPoints: CoachingPoint[]
+}
+
+// Helper type for team selection
+export interface TeamSelectOption {
+  value: string
+  label: string
+  region: LoLRegion
+  emoji: string
+}

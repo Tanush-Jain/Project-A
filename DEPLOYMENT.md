@@ -1,233 +1,192 @@
 # Wopseeion - Production Deployment Guide
 
-## 🚀 Deployment Instructions
+## 🚀 Quick Deploy
 
-### Prerequisites
-- Node.js 18+ installed
-- PostgreSQL database
-- Gemini API key
-- Riot API key (optional)
-- Stripe account (optional)
-- Docker installed (for containerized deployment)
-
-### Environment Setup
-
-1. **Copy environment template**
+### One-Command Deployment (Railway + Vercel)
 ```bash
-cp .env.local.example .env.local
+# 1. Fork/clone repo
+# 2. Create Railway PostgreSQL
+# 3. Import to Vercel
+# 4. Add env vars (see below)
+# 5. Deploy!
 ```
 
-2. **Fill in required variables**
+## Environment Setup
+
+### Required Environment Variables
+
+1. **Copy the template**
 ```bash
-# .env.local
-NEXT_PUBLIC_GEMINI_API_KEY=sk-...
-DATABASE_URL=postgresql://user:password@localhost:5432/wopseeion
-RIOT_API_KEY=RGAPI-...
-STRIPE_SECRET_KEY=sk_test_...
-JWT_SECRET=your-secret-key
+cp .env.example .env.local
 ```
 
-### Local Development
+2. **Fill in these variables:**
 
 ```bash
-# Install dependencies
-npm install
+# Database (Railway, Supabase, or PostgreSQL)
+DATABASE_URL="postgresql://..."
 
-# Run database migrations
-npx prisma migrate dev
+# Gemini AI (https://aistudio.google.com/app/apikey)
+NEXT_PUBLIC_GEMINI_API_KEY="AIzaSy..."
 
-# Start development server
-npm run dev
+# Riot Games API (https://developer.riotgames.com/)
+RIOT_API_KEY="RGAPI-..."
 
-# Open http://localhost:3000
+# Stripe (https://dashboard.stripe.com/apikeys)
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+
+# Stripe Price IDs (create in Stripe Dashboard)
+STRIPE_PRO_MONTHLY_PRICE_ID="price_..."
+STRIPE_PRO_YEARLY_PRICE_ID="price_..."
+STRIPE_TEAM_MONTHLY_PRICE_ID="price_..."
+STRIPE_TEAM_YEARLY_PRICE_ID="price_..."
+
+# App URL
+NEXT_PUBLIC_APP_URL="https://your-domain.com"
+
+# Auth (generate: openssl rand -base64 32)
+NEXTAUTH_SECRET="your-secret"
+NEXTAUTH_URL="https://your-domain.com"
 ```
 
-### Database Setup
+## Deployment Options
+
+### Option 1: Vercel (Recommended)
+
+1. **Push to GitHub**
+```bash
+git add .
+git commit -m "Ready for deployment"
+git push origin main
+```
+
+2. **Import to Vercel**
+- Go to https://vercel.com/new
+- Import your repository
+- Add environment variables in Vercel dashboard
+
+3. **Deploy**
+- Vercel will automatically deploy on push to main
+
+### Option 2: Docker Compose (Local/Server)
 
 ```bash
-# Create database
-createdb wopseeion
+# 1. Configure environment
+cp .env.example .env
+# Edit .env with your values
 
+# 2. Start services
+docker-compose up -d
+
+# 3. Run migrations
+docker-compose exec app npx prisma migrate deploy
+
+# 4. Seed data (optional)
+docker-compose exec app npx prisma db seed
+```
+
+### Option 3: Railway + Vercel
+
+1. **Create Railway Database**
+```bash
+# Install Railway CLI
+npm i -g @railway/cli
+
+# Login and create project
+railway login
+railway init
+railway add postgresql
+railway variables
+```
+
+2. **Get DATABASE_URL** from Railway dashboard
+
+3. **Deploy to Vercel** (see Option 1)
+
+## Database Setup
+
+```bash
 # Run migrations
 npx prisma migrate deploy
 
-# Seed initial data (optional)
+# Generate Prisma Client
+npx prisma generate
+
+# Seed data
 npx prisma db seed
 ```
 
-### Docker Deployment
+## Stripe Webhook Setup
 
+1. **Create webhook endpoint**
+```
+https://your-domain.com/api/stripe/webhook
+```
+
+2. **Add webhook secret** to environment
+```
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+3. **Select events:**
+- `checkout.session.completed`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+- `invoice.payment_failed`
+
+## Post-Deployment Checklist
+
+- [ ] Database migrations run successfully
+- [ ] All environment variables set
+- [ ] Stripe webhooks configured and working
+- [ ] Custom domain connected (optional)
+- [ ] SSL certificate active (automatic on Vercel)
+- [ ] Analytics tracking (Vercel Analytics)
+- [ ] Error tracking (Sentry - optional)
+- [ ] API rate limits configured
+
+## Monitoring
+
+### Vercel Analytics
+- Built-in at: https://vercel.com/dashboard
+
+### Sentry (Optional)
 ```bash
-# Build and run with Docker Compose
-docker-compose up -d
-
-# View logs
-docker-compose logs -f app
-
-# Run migrations in container
-docker-compose exec app npx prisma migrate deploy
+npm install @sentry/nextjs
+```
+Add to `next.config.js`:
+```javascript
+const withSentry = require("@sentry/nextjs")({
+  sentry: {
+    org: "your-org",
+    project: "your-project"
+  }
+})
+module.exports = withSentry({})
 ```
 
-### Vercel Deployment
+## Troubleshooting
 
-1. **Connect repository to Vercel**
+### Build Failures
 ```bash
-npm install -g vercel
-vercel link
-```
-
-2. **Set environment variables in Vercel dashboard**
-```
-NEXT_PUBLIC_GEMINI_API_KEY
-DATABASE_URL
-RIOT_API_KEY
-STRIPE_SECRET_KEY
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-JWT_SECRET
-```
-
-3. **Deploy**
-```bash
-vercel --prod
-```
-
-### Production Checklist
-
-- [ ] Environment variables set correctly
-- [ ] Database migrations completed
-- [ ] Stripe webhooks configured
-- [ ] API rate limits set
-- [ ] SSL/HTTPS enabled
-- [ ] CORS configured
-- [ ] Analytics connected
-- [ ] Error tracking (Sentry) enabled
-- [ ] Database backups configured
-- [ ] CDN enabled for static assets
-- [ ] Cache headers configured
-
-### Performance Optimization
-
-```bash
-# Build analysis
-npm run build -- --analyze
-
-# Generate bundle size report
+# Clear cache
+rm -rf .next node_modules/.cache
+npm install
 npm run build
-
-# Test lighthouse
-npm run lighthouse
 ```
 
-### Monitoring
-
-- **Vercel Analytics**: Built-in performance monitoring
-- **Sentry**: Error tracking (configure in code)
-- **Database Monitoring**: Check PostgreSQL logs
-- **API Metrics**: Monitor in Stripe/Gemini dashboards
-
-### Scaling
-
-For high-traffic scenarios:
-
-1. **Database**
-   - Enable read replicas
-   - Configure connection pooling (PgBouncer)
-   - Monitor slow queries
-
-2. **Application**
-   - Use Redis for caching
-   - Implement rate limiting
-   - Use CDN for static assets
-
-3. **API**
-   - Implement request queuing
-   - Cache Gemini/Riot API responses
-   - Use edge functions for optimization
-
-### Rollback
-
+### Database Connection
 ```bash
-# Rollback last migration
-npx prisma migrate resolve --rolled-back
-
-# Redeploy to previous commit
-git revert HEAD
-git push
-```
-
-### Troubleshooting
-
-**Database Connection Failed**
-```bash
-# Check connection string
-echo $DATABASE_URL
-
 # Test connection
 psql $DATABASE_URL -c "SELECT 1"
+
+# Check Prisma
+npx prisma studio
 ```
 
-**API Key Not Working**
-```bash
-# Verify keys in .env.local
-cat .env.local | grep API_KEY
-
-# Test Gemini API
-curl -X POST https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent \
-  -H "Content-Type: application/json" \
-  -d '{"contents":[{"parts":[{"text":"test"}]}]}' \
-  -H "x-goog-api-key: $NEXT_PUBLIC_GEMINI_API_KEY"
-```
-
-**Build Failures**
-```bash
-# Clear cache and rebuild
-rm -rf .next
-npm run build
-
-# Check for type errors
-npm run type-check
-```
-
-### Security Best Practices
-
-1. **Secrets Management**
-   - Never commit .env.local
-   - Rotate API keys regularly
-   - Use secret manager (GitHub Secrets, Vercel)
-
-2. **Database Security**
-   - Use strong passwords
-   - Enable SSL connections
-   - Restrict database access by IP
-
-3. **API Security**
-   - Implement rate limiting
-   - Use API key rotation
-   - Enable request signing
-
-4. **Application Security**
-   - Enable CORS properly
-   - Implement CSRF protection
-   - Use secure cookies (httpOnly, secure)
-   - Add security headers
-
-### Maintenance
-
-**Weekly Tasks**
-- [ ] Monitor error logs
-- [ ] Check API usage/quotas
-- [ ] Review database performance
-
-**Monthly Tasks**
-- [ ] Database backup verification
-- [ ] Security audit
-- [ ] Dependency updates
-
-**Quarterly Tasks**
-- [ ] Load testing
-- [ ] Security penetration testing
-- [ ] Disaster recovery drills
-
----
-
-For more information, see [Next.js Deployment Docs](https://nextjs.org/docs/deployment)
+### API Errors
+- Check Vercel function logs
+- Verify environment variables
+- Check Stripe/Gemini API quotas

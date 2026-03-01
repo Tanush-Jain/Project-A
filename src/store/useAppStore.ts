@@ -58,10 +58,8 @@ interface AppState {
   setIsLoading: (loading: boolean) => void
 }
 
-const storeCreator: StateCreator<
-  AppState,
-  [['zustand/devtools', never], ['zustand/persist', AppState]]
-> = (set: any) => ({
+// use a simpler typing to avoid generic incompatibility
+const storeCreator: StateCreator<AppState> = (set: any) => ({
   // Auth
   user: null,
   isAuthenticated: false,
